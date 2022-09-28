@@ -1,16 +1,21 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, Text} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import {PieChart} from './src/PieChart';
 
 const App = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Hello</Text>
+      <PieChart />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, alignSelf: 'center', justifyContent: 'center'},
+  container: {
+    flex: 1,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default App;
