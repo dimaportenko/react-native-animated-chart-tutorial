@@ -4,14 +4,17 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --simulator='iPhone 14'",
+    "podinstall": "pod-install",
     "start": "react-native start",
     "test": "jest",
+    "tsc": "tsc",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "react": "18.1.0",
     "react-native": "0.70.1",
+    "react-native-reanimated": "^2.11.0",
     "react-native-svg": "^13.2.0"
   },
   "devDependencies": {
