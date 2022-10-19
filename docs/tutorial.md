@@ -7,7 +7,7 @@ Hey folks! As title said we will build circular chart with `react-native-svg` an
 
 On refresh action we're generating random data for our chart and show it in animated maner.
 
-Let's start with [template]() which has code generating random chart data. 
+Let's start with [template](https://github.com/dimaportenko/react-native-animated-chart-tutorial/tree/template) which has code generating random chart data. 
 
 ```typescript
 export type PieChartData = {
