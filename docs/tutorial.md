@@ -104,4 +104,135 @@ const refresh = () => {
 ```
 <img src='./chart_rotated@2x.png' style="width:375px;" />
 
-To get angle for segment we need multiply chart item percent on 360 (degrees in circle). To rotate each segment around the center we also need specify `originX` and `originY`. 
+To get angle for segment we need multiply 360 (degrees in circle) by chart item percent. To rotate each segment around the center we also need specify `originX` and `originY`. 
+
+Ok, now we have circle chart. Before start animating it let's do small refactoring and move segment drawing in the separated component. 
+
+```typescript
+export const PieChartSegment: FC<{
+  center: number;
+  radius: number;
+  strokeWidth: number;
+  color: string;
+  circumference: number;
+  angle: number;
+  percent: number;
+}> = ({center, radius, strokeWidth, circumference, color, angle, percent}) => {
+  return (
+    <Circle
+      cx={center}
+      cy={center}
+      r={radius}
+      strokeWidth={strokeWidth}
+      stroke={color}
+      strokeDashoffset={circumference * (1 - percent)}
+      strokeDasharray={circumference}
+      originX={center}
+      originY={center}
+      rotation={angle}
+    />
+  );
+};
+
+```
+
+Finally let's use reanimated library. Create `AnimatedCircle` component and use instead `Circle`.
+
+```typescript
+import Animated from 'react-native-reanimated';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+```
+
+Then we add animated value `progress`. Pass `progress` to the `PieChartSegment` and animate it with `withTiming` in `refresh` function.
+
+```typescript
+import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
+
+
+export const PieChart = ({size = 200, strokeWidth = 20}: PieChartProps) => {
+  const progress = useSharedValue(0);
+  // ...
+
+  const refresh = () => {
+    // ...
+
+    progress.value = 0;
+    progress.value = withTiming(1, {
+      duration: 1000,
+    });
+  };
+
+  return (
+    // ...
+      <PieChartSegment
+        // ...
+        progress={progress}
+      />
+    // ...
+  )
+
+```
+
+And in the `PieChartSegment` component let's animated segment length from 0 to it's actual length. 
+
+```typescript 
+const animatedProps = useAnimatedProps(() => {
+  const strokeDashoffset = interpolate(
+    progress.value,
+    [0, 1],
+    [circumference, circumference * (1 - percent)],
+  );
+
+  return {
+    strokeDashoffset,
+  };
+});
+
+return (
+  <AnimatedCircle
+    // ...
+    animatedProps={animatedProps}
+  />
+);
+```
+<img src='./animated1.gif' style="width:375px;" />
+
+
+Basically, we created `animatedProps` with `strokeDashoffset` interpolated value. 
+
+And the last step I want to do here is to animate start position of the each segment. Unfortunatly we can't simply interpolate `rotation` property (tbh I don't know why, it just isn't working as I expect it). But we can't use usual React Native transform styles. 
+
+```typescript
+const animatedProps = useAnimatedProps(() => {
+  // ...
+  const rotateAngle = interpolate(progress.value, [0, 1], [0, angle]);
+
+  return {
+    strokeDashoffset,
+    transform: [
+      {translateX: center},
+      {translateY: center},
+      {rotate: `${rotateAngle}deg`},
+      {translateX: -center},
+      {translateY: -center},
+    ],
+  };
+});
+
+return (
+  <AnimatedCircle
+    // ..
+    // rotation={angle}
+    // @ts-ignore
+    animatedProps={animatedProps}
+  />
+);
+```
+
+<img src='./result.gif' style="width:375px;" />
+
+Tricky part here is that you have to translate segment to the center, make rotation and then translate it back. 
+
+That's it. If you like it, please support me with likes and shares. Feel free to ask me anything in the comments. 
