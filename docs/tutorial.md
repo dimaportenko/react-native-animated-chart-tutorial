@@ -1,13 +1,13 @@
 # React Native Animated Pie Chart (with SVG and reanimated)
 
-Hey folks! As title said we will build circular chart with `react-native-svg` and `react-native-reanimated`. Our final result will look like
+Hey folks! As the title said we will build a circular chart with `react-native-svg` and `react-native-reanimated`. Our final result will look like
 
 <img src='./result.gif' style="width:375px;" />
 <!-- ![final result image](./result.gif) -->
 
-On refresh action we're generating random data for our chart and show it in animated maner.
+On refresh action, we're generating random data for our chart and showing it in an animated manner.
 
-Let's start with [template](https://github.com/dimaportenko/react-native-animated-chart-tutorial/tree/template) which has code generating random chart data. 
+Let's start with the [template](https://github.com/dimaportenko/react-native-animated-chart-tutorial/tree/template) which has code generating random chart data. 
 
 ```typescript
 export type PieChartData = {
@@ -38,9 +38,9 @@ const radius = (size - strokeWidth) / 2;
 ```
 <img src='./pic1.png' style="width:375px;" />
 
-So we added root `Svg` component with `viewBox` of 200 x 200 size. And `Circle` inside with center, radious, stroke width and color. 
+So we added the root `Svg` component with `viewBox` of 200 x 200 size. And `Circle` inside with center, radius, stroke width, and color. 
 
-For pie chart we will need just a segment of circle. We can archive it with `strokeDashoffset` and `strokeDasharray` params.  
+For the pie chart, we will need just a segment of a circle. We can archive it with `strokeDashoffset` and `strokeDasharray` params.  
 
 ```typescript
 const circumference = 2 * Math.PI * radius;
@@ -53,7 +53,7 @@ const circumference = 2 * Math.PI * radius;
 ```
 <img src='./segment@2x.png' style="width:375px;" />
 
-First of all we calculate `circumference`. And if we want circle segment length of 25% then rest 75% suppose to be `strokeDashoffset` like `circumference * (1 - 0.25)`.
+First of all, we calculate the `circumference`. And if we want a circle segment length of 25% then the rest 75% suppose to be `strokeDashoffset` like `circumference * (1 - 0.25)`.
 
 Now we can loop over our data and draw all the chart segments.
 
@@ -75,7 +75,7 @@ Now we can loop over our data and draw all the chart segments.
 ```
 <img src='./segments@2x.png' style="width:375px;" />
 
-We drew segments but they place on top of each other. To fix this we can rotate each segment on sum of angles of previous segments. 
+We drew segments but they place on top of each other. To fix this we can rotate each segment on a sum of the angles of previous segments. 
 
 ```typescript
 const [startAngles, setStartAngles] = React.useState<number[]>([]);
@@ -104,9 +104,9 @@ const refresh = () => {
 ```
 <img src='./chart_rotated@2x.png' style="width:375px;" />
 
-To get angle for segment we need multiply 360 (degrees in circle) by chart item percent. To rotate each segment around the center we also need specify `originX` and `originY`. 
+To get an angle for a segment we need to multiply 360 (degrees in a circle) by the chart item percent. To rotate each segment around the center we also need to specify `originX` and `originY`. 
 
-Ok, now we have circle chart. Before start animating it let's do small refactoring and move segment drawing in the separated component. 
+Ok, now we have a circle chart. Before starting animating it let's do small refactoring and move segment drawing in the separated component. 
 
 ```typescript
 export const PieChartSegment: FC<{
@@ -136,7 +136,7 @@ export const PieChartSegment: FC<{
 
 ```
 
-Finally let's use reanimated library. Create `AnimatedCircle` component and use instead `Circle`.
+Finally, let's use the reanimated library. Create `AnimatedCircle` component and use instead `Circle`.
 
 ```typescript
 import Animated from 'react-native-reanimated';
@@ -145,7 +145,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 ```
 
-Then we add animated value `progress`. Pass `progress` to the `PieChartSegment` and animate it with `withTiming` in `refresh` function.
+Then we add animated value `progress`. Pass `progress` to the `PieChartSegment` and animate it with `withTiming` in the `refresh` function.
 
 ```typescript
 import Animated, {useSharedValue, withTiming} from 'react-native-reanimated';
@@ -175,7 +175,7 @@ export const PieChart = ({size = 200, strokeWidth = 20}: PieChartProps) => {
 
 ```
 
-And in the `PieChartSegment` component let's animated segment length from 0 to it's actual length. 
+And in the `PieChartSegment` component, let's animate the segment length from 0 to its actual length. 
 
 ```typescript 
 const animatedProps = useAnimatedProps(() => {
@@ -202,7 +202,7 @@ return (
 
 Basically, we created `animatedProps` with `strokeDashoffset` interpolated value. 
 
-And the last step I want to do here is to animate start position of the each segment. Unfortunatly we can't simply interpolate `rotation` property (tbh I don't know why, it just isn't working as I expect it). But we can't use usual React Native transform styles. 
+And the last step I want to do here is to animate the start position of each segment. Unfortunately, we can't simply interpolate `rotation` property (tbh I don't know why it just isn't working as I expect it). But we can't use the usual React Native transform styles. 
 
 ```typescript
 const animatedProps = useAnimatedProps(() => {
