@@ -1,7 +1,6 @@
 import React, {FC, useEffect} from 'react';
 import {View, Text, StyleSheet, Button} from 'react-native';
 import Svg, {Circle} from 'react-native-svg';
-import {generatePieChartData} from './data';
 import Animated, {
   interpolate,
   useAnimatedProps,
@@ -9,62 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-const ChartArc: FC<{
-  startAngle: number;
-  center: number;
-  radius: number;
-  color: string;
-  strokeWidth: number;
-  percent: number;
-  circumference: number;
-  progress: Animated.SharedValue<number>;
-}> = ({
-  startAngle,
-  center,
-  color,
-  radius,
-  strokeWidth,
-  circumference,
-  percent,
-  progress,
-}) => {
-  const animatedProps = useAnimatedProps(() => {
-    const angle = interpolate(progress.value, [0, 1], [0, startAngle]);
-    const strokeDashoffset = interpolate(
-      progress.value,
-      [0, 1],
-      [circumference, circumference * (1 - percent)],
-    );
-
-    return {
-      strokeDashoffset,
-      transform: [
-        {translateX: center},
-        {translateY: center},
-        {rotate: `${angle}deg`},
-        {translateX: -center},
-        {translateY: -center},
-      ],
-    };
-  }, [startAngle, circumference, percent, progress]);
-
-  return (
-    <AnimatedCircle
-      cx={center}
-      cy={center}
-      originX={center}
-      originY={center}
-      r={radius}
-      strokeWidth={strokeWidth}
-      stroke={color}
-      strokeDasharray={circumference}
-      // @ts-ignore
-      animatedProps={animatedProps}
-    />
-  );
-};
+import {generatePieChartData} from './data';
 
 type PieChartProps = {
   size?: number;
@@ -76,28 +20,87 @@ export type PieChartDataItem = {
   percent: number;
 };
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
 export type PieChartData = PieChartDataItem[];
+
+export const PieChartSegment: FC<{
+  center: number;
+  radius: number;
+  strokeWidth: number;
+  color: string;
+  circumference: number;
+  angle: number;
+  percent: number;
+  progress: Animated.SharedValue<number>;
+}> = ({
+  center,
+  radius,
+  strokeWidth,
+  circumference,
+  color,
+  angle,
+  percent,
+  progress,
+}) => {
+  const animatedProps = useAnimatedProps(() => {
+    const strokeDashoffset = interpolate(
+      progress.value,
+      [0, 1],
+      [circumference, circumference * (1 - percent)],
+    );
+    const rotateAngle = interpolate(progress.value, [0, 1], [0, angle]);
+
+    return {
+      strokeDashoffset,
+      transform: [
+        {translateX: center},
+        {translateY: center},
+        {rotate: `${rotateAngle}deg`},
+        {translateX: -center},
+        {translateY: -center},
+      ],
+    };
+  });
+
+  return (
+    <AnimatedCircle
+      cx={center}
+      cy={center}
+      r={radius}
+      strokeWidth={strokeWidth}
+      stroke={color}
+      strokeDasharray={circumference}
+      originX={center}
+      originY={center}
+      // @ts-ignore
+      animatedProps={animatedProps}
+    />
+  );
+};
 
 export const PieChart = ({size = 200, strokeWidth = 20}: PieChartProps) => {
   const progress = useSharedValue(0);
   const [data, setData] = React.useState<PieChartData>([]);
-  const [startAngle, setStartAngle] = React.useState<number[]>([]);
+  const [startAngles, setStartAngles] = React.useState<number[]>([]);
+  const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const center = size / 2;
-  // const strokeDashoffset = (1 - percent) * circumference;
 
   const refresh = () => {
-    progress.value = 0;
     const generatedData = generatePieChartData();
+
     let angle = 0;
     const angles: number[] = [];
     generatedData.forEach(item => {
       angles.push(angle);
       angle += item.percent * 360;
     });
+
     setData(generatedData);
-    setStartAngle(angles);
+    setStartAngles(angles);
+
+    progress.value = 0;
     progress.value = withTiming(1, {
       duration: 1000,
     });
@@ -110,24 +113,22 @@ export const PieChart = ({size = 200, strokeWidth = 20}: PieChartProps) => {
 
   return (
     <View>
-      <Text style={styles.titleStyle}>PieChart</Text>
+      <Text style={styles.titleStyle}>Pie Chart</Text>
       <View style={[{width: size, height: size}, styles.rotate]}>
         <Svg viewBox={`0 0 ${size} ${size}`}>
-          {data.map((item, index) => {
-            return (
-              <ChartArc
-                startAngle={startAngle[index]}
-                key={`${item.color}-${index}`}
-                center={center}
-                radius={radius}
-                strokeWidth={strokeWidth}
-                color={item.color}
-                circumference={circumference}
-                percent={item.percent}
-                progress={progress}
-              />
-            );
-          })}
+          {data.map((item, index) => (
+            <PieChartSegment
+              key={`${item.color}-${index}`}
+              center={center}
+              radius={radius}
+              circumference={circumference}
+              angle={startAngles[index]}
+              color={item.color}
+              percent={item.percent}
+              strokeWidth={strokeWidth}
+              progress={progress}
+            />
+          ))}
         </Svg>
       </View>
       <View style={styles.buttonWrap}>

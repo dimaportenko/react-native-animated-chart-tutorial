@@ -1,27 +1,8 @@
 # React Native Animated Pie Chart (with SVG and reanimated)
 
-<div align="center">
-  <a align="center" href="https://github.com/dimaportenko?tab=followers">
-    <img src="https://img.shields.io/github/followers/dimaportenko?label=Follow%20%40dimaportenko&style=social" />
-  </a>
-  <br/>
-  <a align="center" href="https://twitter.com/dimaportenko">
-    <img src="https://img.shields.io/twitter/follow/dimaportenko?label=Follow%20%40dimaportenko&style=social" />
-  </a>
-  <br/>
-  <a align="center" href="https://www.youtube.com/channel/UCReKeeIMZywvQoaZPZKzQbQ">
-    <img src="https://img.shields.io/youtube/channel/subscribers/UCReKeeIMZywvQoaZPZKzQbQ" />
-  </a>
-  <br/>
-  <a align="center" href="https://www.youtube.com/channel/UCReKeeIMZywvQoaZPZKzQbQ">
-    <img src="https://img.shields.io/youtube/channel/views/UCReKeeIMZywvQoaZPZKzQbQ" />
-  </a>
-</div>
-<br/>
-
 Hey folks! As the title said we will build a circular chart with `react-native-svg` and `react-native-reanimated`. Our final result will look like
 
-<img src='./docs/result.gif' style="width:375px;" />
+<img src='./result.gif' style="width:375px;" />
 <!-- ![final result image](./result.gif) -->
 
 On refresh action, we're generating random data for our chart and showing it in an animated manner.
@@ -55,7 +36,7 @@ const radius = (size - strokeWidth) / 2;
   />
 </Svg>
 ```
-<img src='./docs/pic1.png' style="width:375px;" />
+<img src='./pic1.png' style="width:375px;" />
 
 So we added the root `Svg` component with `viewBox` of 200 x 200 size. And `Circle` inside with center, radius, stroke width, and color. 
 
@@ -70,7 +51,7 @@ const circumference = 2 * Math.PI * radius;
   strokeDasharray={circumference}
 />
 ```
-<img src='./docs/segment@2x.png' style="width:375px;" />
+<img src='./segment@2x.png' style="width:375px;" />
 
 First of all, we calculate the `circumference`. And if we want a circle segment length of 25% then the rest 75% suppose to be `strokeDashoffset` like `circumference * (1 - 0.25)`.
 
@@ -92,7 +73,7 @@ Now we can loop over our data and draw all the chart segments.
   ))}
 </Svg>
 ```
-<img src='./docs/segments@2x.png' style="width:375px;" />
+<img src='./segments@2x.png' style="width:375px;" />
 
 We drew segments but they place on top of each other. To fix this we can rotate each segment on a sum of the angles of previous segments. 
 
@@ -121,7 +102,7 @@ const refresh = () => {
   rotation={startAngles[index]}
 />
 ```
-<img src='./docs/chart_rotated@2x.png' style="width:375px;" />
+<img src='./chart_rotated@2x.png' style="width:375px;" />
 
 To get an angle for a segment we need to multiply 360 (degrees in a circle) by the chart item percent. To rotate each segment around the center we also need to specify `originX` and `originY`. 
 
@@ -216,7 +197,7 @@ return (
   />
 );
 ```
-<img src='./docs/animated1.gif' style="width:375px;" />
+<img src='./animated1.gif' style="width:375px;" />
 
 
 Basically, we created `animatedProps` with `strokeDashoffset` interpolated value. 
@@ -250,9 +231,8 @@ return (
 );
 ```
 
-<img src='./docs/result.gif' style="width:375px;" />
+<img src='./result.gif' style="width:375px;" />
 
 Tricky part here is that you have to translate segment to the center, make rotation and then translate it back. 
 
-That's it. Final code is available on [github](https://github.com/dimaportenko/react-native-animated-chart-tutorial). If you like it, please support me with likes and shares. Feel free to ask me anything in the comments. 
-
+That's it. If you like it, please support me with likes and shares. Feel free to ask me anything in the comments. 
