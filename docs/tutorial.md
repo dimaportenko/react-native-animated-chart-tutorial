@@ -21,6 +21,11 @@ Since we have data we can start working on it's visualisation. Let's draw circle
 ```typescript
 import Svg, {Circle} from 'react-native-svg';
 
+const strokeWidth = 20;
+const size = 200;
+const center = size / 2;
+const radius = (size - strokeWidth) / 2;
+
 <Svg viewBox={`0 0 ${size} ${size}`}>
   <Circle
     cx={center}
@@ -33,3 +38,70 @@ import Svg, {Circle} from 'react-native-svg';
 ```
 <img src='./pic1.png' style="width:375px;" />
 
+So we added root `Svg` component with `viewBox` of 200 x 200 size. And `Circle` inside with center, radious, stroke width and color. 
+
+For pie chart we will need just a segment of circle. We can archive it with `strokeDashoffset` and `strokeDasharray` params.  
+
+```typescript
+const circumference = 2 * Math.PI * radius;
+
+<Circle
+  // ...
+  strokeDashoffset={circumference * (1 - 0.25)} // 25% circle segment
+  strokeDasharray={circumference}
+/>
+```
+<img src='./segment@2x.png' style="width:375px;" />
+
+First of all we calculate `circumference`. And if we want circle segment length of 25% then rest 75% suppose to be `strokeDashoffset` like `circumference * (1 - 0.25)`.
+
+Now we can loop over our data and draw all the chart segments.
+
+```typescript
+<Svg viewBox={`0 0 ${size} ${size}`}>
+  {data.map((item, index) => (
+    <Circle
+      key={`${item.color}-${index}`}
+      cx={center}
+      cy={center}
+      r={radius}
+      strokeWidth={strokeWidth}
+      stroke={item.color}
+      strokeDashoffset={circumference * (1 - item.percent)}
+      strokeDasharray={circumference}
+    />
+  ))}
+</Svg>
+```
+<img src='./segments@2x.png' style="width:375px;" />
+
+We drew segments but they place on top of each other. To fix this we can rotate each segment on sum of angles of previous segments. 
+
+```typescript
+const [startAngles, setStartAngles] = React.useState<number[]>([]);
+
+const refresh = () => {
+  const generatedData = generatePieChartData();
+
+  let angle = 0;
+  const angles: number[] = [];
+  generatedData.forEach(item => {
+    angles.push(angle);
+    angle += item.percent * 360;
+  });
+
+  setData(generatedData);
+  setStartAngles(angles);
+};
+
+
+<Circle
+  // ...
+  originX={center}
+  originY={center}
+  rotation={startAngles[index]}
+/>
+```
+<img src='./chart_rotated@2x.png' style="width:375px;" />
+
+To get angle for segment we need multiply chart item percent on 360 (degrees in circle). To rotate each segment around the center we also need specify `originX` and `originY`. 
