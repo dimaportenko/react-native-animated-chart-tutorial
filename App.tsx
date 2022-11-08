@@ -1,6 +1,8 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {LogBox, SafeAreaView, StyleSheet} from 'react-native';
 import {PieChart} from './src/PieChart';
+
+LogBox.ignoreAllLogs();
 
 const App = () => {
   return (
