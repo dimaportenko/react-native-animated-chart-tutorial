@@ -24,6 +24,15 @@ Hey folks! As the title said we will build a circular chart with `react-native-s
 <img src='./docs/result.gif' style="width:375px;" />
 <!-- ![final result image](./result.gif) -->
 
+
+<br>
+<br>
+<br>
+
+[![Youtube Thumb](./docs/youtube_thumb@2x.png)](https://youtu.be/owWQE9r9--w "SVG Reaniamted Chart Youtube Tutorial")
+
+<br>
+
 On refresh action, we're generating random data for our chart and showing it in an animated manner.
 
 Let's start with the [template](https://github.com/dimaportenko/react-native-animated-chart-tutorial/tree/template) which has code generating random chart data. 
